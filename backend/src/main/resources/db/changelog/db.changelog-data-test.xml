@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Заполнение данных с UUID -->
+    <!-- Теги -->
+    <changeSet id="data-1" author="dev" runAlways="true">
+        <insert tableName="tags">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Веганская"/>
+        </insert>
+        <insert tableName="tags">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Безглютеновая"/>
+        </insert>
+        <insert tableName="tags">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Кето"/>
+        </insert>
+    </changeSet>
+
+    <!-- Ингредиенты -->
+    <changeSet id="data-2" author="dev" runAlways="true">
+        <insert tableName="ingredients">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Тофу"/>
+        </insert>
+        <insert tableName="ingredients">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Глютен"/>
+        </insert>
+        <insert tableName="ingredients">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Брокколи"/>
+        </insert>
+        <insert tableName="ingredients">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Авокадо"/>
+        </insert>
+    </changeSet>
+
+    <!-- Рецепты -->
+    <changeSet id="data-3" author="dev" runAlways="true">
+        <insert tableName="recipes">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Веганский суп"/>
+            <column name="description" value="Полезный суп из овощей"/>
+            <column name="calories" valueNumeric="200"/>
+            <column name="proteins" valueNumeric="10"/>
+            <column name="fats" valueNumeric="5"/>
+            <column name="carbohydrates" valueNumeric="25"/>
+            <column name="cook_time" valueNumeric="30"/>
+            <column name="servings" valueNumeric="2"/>
+            <column name="instructions" value="Вскипятите воду, добавьте овощи, варите 30 минут."/>
+        </insert>
+
+        <insert tableName="recipes">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Брокколи стир-фрай"/>
+            <column name="description" value="Жареные брокколи с тофу"/>
+            <column name="calories" valueNumeric="300"/>
+            <column name="proteins" valueNumeric="15"/>
+            <column name="fats" valueNumeric="10"/>
+            <column name="carbohydrates" valueNumeric="20"/>
+            <column name="cook_time" valueNumeric="20"/>
+            <column name="servings" valueNumeric="1"/>
+            <column name="instructions" value="Обжарьте брокколи и тофу на сковороде."/>
+        </insert>
+
+        <insert tableName="recipes">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Кето салат"/>
+            <column name="description" value="Салат с авокадо и орехами"/>
+            <column name="calories" valueNumeric="450"/>
+            <column name="proteins" valueNumeric="8"/>
+            <column name="fats" valueNumeric="35"/>
+            <column name="carbohydrates" valueNumeric="7"/>
+            <column name="cook_time" valueNumeric="10"/>
+            <column name="servings" valueNumeric="1"/>
+            <column name="instructions" value="Нарежьте авокадо и орехи, смешайте и подавайте."/>
+        </insert>
+    </changeSet>
+
+    <!-- Пользователи -->
+    <changeSet id="data-4" author="dev" runAlways="true">
+        <insert tableName="users">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="telegram_id" valueNumeric="1234567890"/>
+            <column name="name" value="Тестовый пользователь"/>
+            <column name="gender" value="MALE"/>
+            <column name="age" valueNumeric="30"/>
+            <column name="weight" valueNumeric="75"/>
+            <column name="height" valueNumeric="180"/>
+            <column name="activity_level" value="LIGHT"/>
+            <column name="diet_goal" value="MAINTAIN"/>
+            <column name="goal_calories" valueNumeric="2500"/>
+            <column name="meal_count" valueNumeric="3"/>
+            <column name="meal_plan"><![CDATA[{"meals": {"Завтрак": 500.0, "Обед": 800.0, "Ужин": 700.0}}]]></column>
+            <column name="meal_plan"><![CDATA[{"Завтрак": 500.0, "Обед": 800.0, "Ужин": 700.0}]]></column>
+
+        </insert>
+    </changeSet>
+
+    <!-- Связи recipe_tags -->
+    <changeSet id="data-5" author="dev" runAlways="true">
+        <insert tableName="recipe_tags">
+            <column name="recipe_id" valueComputed="(SELECT id FROM recipes WHERE name = 'Веганский суп')"/>
+            <column name="tag_id" valueComputed="(SELECT id FROM tags WHERE name = 'Веганская')"/>
+            <column name="priority" valueNumeric="1"/>
+        </insert>
+        <insert tableName="recipe_tags">
+            <column name="recipe_id" valueComputed="(SELECT id FROM recipes WHERE name='Брокколи стир-фрай')"/>
+            <column name="tag_id" valueComputed="(SELECT id FROM tags WHERE name='Безглютеновая')"/>
+            <column name="priority" valueNumeric="1"/>
+        </insert>
+        <insert tableName="recipe_tags">
+            <column name="recipe_id" valueComputed="(SELECT id FROM recipes WHERE name = 'Кето салат')"/>
+            <column name="tag_id" valueComputed="(SELECT id FROM tags WHERE name = 'Кето')"/>
+            <column name="priority" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+
+    <!-- Связи recipe_ingredients -->
+    <changeSet id="data-6" author="dev" runAlways="true">
+        <!-- Веганский суп -->
+        <insert tableName="recipe_ingredients">
+            <column name="recipe_id" valueComputed="(SELECT id FROM recipes WHERE name = 'Веганский суп')"/>
+            <column name="ingredient_id" valueComputed="(SELECT id FROM ingredients WHERE name = 'Тофу')"/>
+            <column name="quantity" valueNumeric="200"/>
+            <column name="unit" value="г"/>
+            <column name="quantity_text" value="200г Тофу"/>
+        </insert>
+        <insert tableName="recipe_ingredients">
+            <column name="recipe_id" valueComputed="(SELECT id FROM recipes WHERE name = 'Веганский суп')"/>
+            <column name="ingredient_id" valueComputed="(SELECT id FROM ingredients WHERE name = 'Глютен')"/>
+            <column name="quantity" valueNumeric="50"/>
+            <column name="unit" value="г"/>
+            <column name="quantity_text" value="50г Глютена"/>
+        </insert>
+
+        <!-- Брокколи стир-фрай -->
+        <insert tableName="recipe_ingredients">
+            <column name="recipe_id" valueComputed="(SELECT id FROM recipes WHERE name = 'Брокколи стир-фрай')"/>
+            <column name="ingredient_id" valueComputed="(SELECT id FROM ingredients WHERE name = 'Брокколи')"/>
+            <column name="quantity" valueNumeric="150"/>
+            <column name="unit" value="г"/>
+            <column name="quantity_text" value="150г Брокколи"/>
+        </insert>
+
+        <!-- Авокадо Кето салат -->
+        <insert tableName="recipe_ingredients">
+            <column name="recipe_id" valueComputed="(SELECT id FROM recipes WHERE name = 'Кето салат')"/>
+            <column name="ingredient_id" valueComputed="(SELECT id FROM ingredients WHERE name = 'Авокадо')"/>
+            <column name="quantity" valueNumeric="150"/>
+            <column name="unit" value="г"/>
+            <column name="quantity_text" value="150г Авокадо"/>
+        </insert>
+    </changeSet>
+
+    <!-- Связи user_preferred_tags -->
+    <changeSet id="data-7" author="dev" runAlways="true">
+        <insert tableName="user_preferred_tags">
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE telegram_id=1234567890)"/>
+            <column name="tag_id" valueComputed="(SELECT id FROM tags WHERE name='Веганская')"/>
+        </insert>
+        <insert tableName="user_preferred_tags">
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE telegram_id=1234567890)"/>
+            <column name="tag_id" valueComputed="(SELECT id FROM tags WHERE name='Кето')"/>
+        </insert>
+    </changeSet>
+
+    <!-- Связи user_excluded_ingredients -->
+    <changeSet id="data-8" author="dev" runAlways="true">
+        <insert tableName="user_excluded_ingredients">
+            <column name="user_id" valueComputed="(SELECT id FROM users WHERE telegram_id=1234567890)"/>
+            <column name="ingredient_id" valueComputed="(SELECT id FROM ingredients WHERE name='Глютен')"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

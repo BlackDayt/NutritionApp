@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="data-1" author="dev">
+        <insert tableName="tags">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Веганская"/>
+        </insert>
+        <insert tableName="tags">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Безглютеновая"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="data-2" author="dev">
+        <insert tableName="ingredients">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Тофу"/>
+        </insert>
+        <insert tableName="ingredients">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Глютен"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="data-3" author="dev">
+        <insert tableName="recipes">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Веганский суп"/>
+            <column name="description" value="Полезный суп из овощей"/>
+            <column name="calories" valueNumeric="200"/>
+            <column name="proteins" valueNumeric="10"/>
+            <column name="fats" valueNumeric="5"/>
+            <column name="carbohydrates" valueNumeric="25"/>
+            <column name="cook_time" valueNumeric="30"/>
+            <column name="servings" valueNumeric="2"/>
+            <column name="instructions" value="Вскипятите воду, добавьте овощи, варите 30 минут."/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="data-4" author="dev">
+        <insert tableName="recipe_tags">
+            <column name="recipe_id" valueNumeric="1"/>
+            <column name="tag_id" valueNumeric="1"/>
+            <column name="priority" valueNumeric="1"/>
+        </insert>
+        <insert tableName="recipe_tags">
+            <column name="recipe_id" valueNumeric="1"/>
+            <column name="tag_id" valueNumeric="2"/>
+            <column name="priority" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="data-5" author="dev">
+        <insert tableName="recipe_ingredients">
+            <column name="recipe_id" valueNumeric="1"/>
+            <column name="ingredient_id" valueNumeric="1"/>
+            <column name="quantity" valueNumeric="200"/>
+            <column name="unit" value="г"/>
+            <column name="quantity_text" value="200г Тофу"/>
+        </insert>
+        <insert tableName="recipe_ingredients">
+            <column name="recipe_id" valueNumeric="1"/>
+            <column name="ingredient_id" valueNumeric="2"/>
+            <column name="quantity" valueNumeric="50"/>
+            <column name="unit" value="г"/>
+            <column name="quantity_text" value="50г Глютена"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

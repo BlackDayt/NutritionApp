@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+
+
+
+
+
+<!--    &lt;!&ndash; ✅ 1. Создание таблицы tags &ndash;&gt;-->
+<!--    <changeSet id="1" author="dev">-->
+<!--        <createTable tableName="tags">-->
+<!--            <column name="id" type="bigserial">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="varchar(255)">-->
+<!--                <constraints nullable="false" unique="true"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 2. Создание таблицы ingredients &ndash;&gt;-->
+<!--    <changeSet id="2" author="dev">-->
+<!--        <createTable tableName="ingredients">-->
+<!--            <column name="id" type="bigserial">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="varchar(255)">-->
+<!--                <constraints nullable="false" unique="true"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 3. Создание таблицы recipes &ndash;&gt;-->
+<!--    <changeSet id="3" author="dev">-->
+<!--        <createTable tableName="recipes">-->
+<!--            <column name="id" type="bigserial">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="varchar(255)">-->
+<!--                <constraints nullable="false" unique="true"/>-->
+<!--            </column>-->
+<!--            <column name="description" type="TEXT"/>-->
+<!--            <column name="calories" type="integer">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="proteins" type="integer">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="fats" type="integer">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="carbohydrates" type="integer">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="cook_time" type="integer">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="servings" type="integer">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="instructions" type="TEXT"/>-->
+<!--            <column name="image_url" type="varchar(512)"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 4. Создание таблицы recipe_tags &ndash;&gt;-->
+<!--    <changeSet id="4" author="dev">-->
+<!--        <createTable tableName="recipe_tags">-->
+<!--            <column name="recipe_id" type="bigint">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="tag_id" type="bigint">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="priority" type="integer"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 5. Добавление PRIMARY KEY в recipe_tags &ndash;&gt;-->
+<!--    <changeSet id="4.2" author="dev">-->
+<!--        <addPrimaryKey tableName="recipe_tags" columnNames="recipe_id, tag_id"/>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 6. Добавление внешних ключей в recipe_tags &ndash;&gt;-->
+<!--    <changeSet id="4.3" author="dev">-->
+<!--        <addForeignKeyConstraint baseTableName="recipe_tags" baseColumnNames="recipe_id"-->
+<!--                                 referencedTableName="recipes" referencedColumnNames="id"-->
+<!--                                 constraintName="fk_recipe_tags_recipe"/>-->
+<!--        <addForeignKeyConstraint baseTableName="recipe_tags" baseColumnNames="tag_id"-->
+<!--                                 referencedTableName="tags" referencedColumnNames="id"-->
+<!--                                 constraintName="fk_recipe_tags_tag"/>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 7. Создание таблицы recipe_ingredients &ndash;&gt;-->
+<!--    <changeSet id="5" author="dev">-->
+<!--        <createTable tableName="recipe_ingredients">-->
+<!--            <column name="recipe_id" type="bigint">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="ingredient_id" type="bigint">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="quantity" type="float"/>-->
+<!--            <column name="unit" type="varchar(50)"/>-->
+<!--            <column name="quantity_text" type="varchar(255)"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 8. Добавление PRIMARY KEY в recipe_ingredients &ndash;&gt;-->
+<!--    <changeSet id="5.2" author="dev">-->
+<!--        <addPrimaryKey tableName="recipe_ingredients" columnNames="recipe_id, ingredient_id"/>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 9. Добавление внешних ключей в recipe_ingredients &ndash;&gt;-->
+<!--    <changeSet id="5.3" author="dev">-->
+<!--        <addForeignKeyConstraint baseTableName="recipe_ingredients" baseColumnNames="recipe_id"-->
+<!--                                 referencedTableName="recipes" referencedColumnNames="id"-->
+<!--                                 constraintName="fk_recipe_ingredients_recipe"/>-->
+<!--        <addForeignKeyConstraint baseTableName="recipe_ingredients" baseColumnNames="ingredient_id"-->
+<!--                                 referencedTableName="ingredients" referencedColumnNames="id"-->
+<!--                                 constraintName="fk_recipe_ingredients_ingredient"/>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 10. Создание таблицы users &ndash;&gt;-->
+<!--    <changeSet id="6" author="dev">-->
+<!--        <createTable tableName="users">-->
+<!--            <column name="id" type="bigserial">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="varchar(255)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="email" type="varchar(255)">-->
+<!--                <constraints nullable="false" unique="true"/>-->
+<!--            </column>-->
+<!--            <column name="password" type="varchar(255)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 11. Создание таблицы user_excluded_ingredients &ndash;&gt;-->
+<!--    <changeSet id="7" author="dev">-->
+<!--        <createTable tableName="user_excluded_ingredients">-->
+<!--            <column name="user_id" type="bigint">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="ingredient_id" type="bigint">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 12. Добавление PRIMARY KEY в user_excluded_ingredients &ndash;&gt;-->
+<!--    <changeSet id="7.2" author="dev">-->
+<!--        <addPrimaryKey tableName="user_excluded_ingredients" columnNames="user_id, ingredient_id"/>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 13. Добавление внешних ключей в user_excluded_ingredients &ndash;&gt;-->
+<!--    <changeSet id="7.3" author="dev">-->
+<!--        <addForeignKeyConstraint baseTableName="user_excluded_ingredients" baseColumnNames="user_id"-->
+<!--                                 referencedTableName="users" referencedColumnNames="id"-->
+<!--                                 constraintName="fk_user_excluded_ingredients_user"/>-->
+<!--        <addForeignKeyConstraint baseTableName="user_excluded_ingredients" baseColumnNames="ingredient_id"-->
+<!--                                 referencedTableName="ingredients" referencedColumnNames="id"-->
+<!--                                 constraintName="fk_user_excluded_ingredients_ingredient"/>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 14. Наполнение таблицы tags &ndash;&gt;-->
+<!--    <changeSet id="8" author="dev">-->
+<!--        <insert tableName="tags">-->
+<!--            <column name="id" valueNumeric="1"/>-->
+<!--            <column name="name" value="Веганская"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="tags">-->
+<!--            <column name="id" valueNumeric="2"/>-->
+<!--            <column name="name" value="Безглютеновая"/>-->
+<!--        </insert>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 15. Наполнение таблицы ingredients &ndash;&gt;-->
+<!--    <changeSet id="9" author="dev">-->
+<!--        <insert tableName="ingredients">-->
+<!--            <column name="id" valueNumeric="1"/>-->
+<!--            <column name="name" value="Тофу"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="ingredients">-->
+<!--            <column name="id" valueNumeric="2"/>-->
+<!--            <column name="name" value="Глютен"/>-->
+<!--        </insert>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 16. Наполнение таблицы recipes &ndash;&gt;-->
+<!--    <changeSet id="10" author="dev">-->
+<!--        <insert tableName="recipes">-->
+<!--            <column name="id" valueNumeric="1"/>-->
+<!--            <column name="name" value="Веганский суп"/>-->
+<!--            <column name="description" value="Полезный суп из овощей"/>-->
+<!--            <column name="calories" valueNumeric="200"/>-->
+<!--            <column name="proteins" valueNumeric="10"/>-->
+<!--            <column name="fats" valueNumeric="5"/>-->
+<!--            <column name="carbohydrates" valueNumeric="25"/>-->
+<!--            <column name="cook_time" valueNumeric="30"/>-->
+<!--            <column name="servings" valueNumeric="2"/>-->
+<!--            <column name="instructions" value="Вскипятите воду, добавьте овощи, варите 30 минут."/>-->
+<!--        </insert>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 17. Наполнение таблицы recipe_tags &ndash;&gt;-->
+<!--    <changeSet id="11" author="dev">-->
+<!--        <insert tableName="recipe_tags">-->
+<!--            <column name="recipe_id" valueNumeric="1"/>-->
+<!--            <column name="tag_id" valueNumeric="1"/>-->
+<!--            <column name="priority" valueNumeric="1"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="recipe_tags">-->
+<!--            <column name="recipe_id" valueNumeric="1"/>-->
+<!--            <column name="tag_id" valueNumeric="2"/>-->
+<!--            <column name="priority" valueNumeric="2"/>-->
+<!--        </insert>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 18. Наполнение таблицы recipe_ingredients &ndash;&gt;-->
+<!--    <changeSet id="12" author="dev">-->
+<!--        <insert tableName="recipe_ingredients">-->
+<!--            <column name="recipe_id" valueNumeric="1"/>-->
+<!--            <column name="ingredient_id" valueNumeric="1"/>-->
+<!--            <column name="quantity" valueNumeric="200"/>-->
+<!--            <column name="unit" value="г"/>-->
+<!--            <column name="quantity_text" value="200г Тофу"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="recipe_ingredients">-->
+<!--            <column name="recipe_id" valueNumeric="1"/>-->
+<!--            <column name="ingredient_id" valueNumeric="2"/>-->
+<!--            <column name="quantity" valueNumeric="50"/>-->
+<!--            <column name="unit" value="г"/>-->
+<!--            <column name="quantity_text" value="50г Глютена"/>-->
+<!--        </insert>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 19. Добавляем тестового пользователя &ndash;&gt;-->
+<!--    <changeSet id="13" author="dev">-->
+<!--        <insert tableName="users">-->
+<!--            <column name="id" valueNumeric="1"/>-->
+<!--            <column name="name" value="Тестовый Пользователь"/>-->
+<!--            <column name="email" value="test@example.com"/>-->
+<!--            <column name="password" value="hashed-password"/>-->
+<!--        </insert>-->
+<!--    </changeSet>-->
+
+<!--    &lt;!&ndash; ✅ 20. Добавляем исключённые ингредиенты &ndash;&gt;-->
+<!--    <changeSet id="14" author="dev">-->
+<!--        <insert tableName="user_excluded_ingredients">-->
+<!--            <column name="user_id" valueNumeric="1"/>-->
+<!--            <column name="ingredient_id" valueNumeric="2"/>-->
+<!--        </insert>-->
+<!--    </changeSet>-->
+
+
+    <!-- Схема -->
+    <include file="db.changelog-schema.xml" relativeToChangelogFile="true"/>
+
+    <!-- Данные -->
+    <include file="db.changelog-data.xml" relativeToChangelogFile="true"/>
+</databaseChangeLog>

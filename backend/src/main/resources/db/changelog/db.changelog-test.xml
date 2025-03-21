@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Сброс -->
+    <include file="db.changelog-reset.xml" relativeToChangelogFile="true" context="test"/>
+
+    <!-- Схема -->
+    <include file="db.changelog-schema-test.xml" relativeToChangelogFile="true" context="test"/>
+
+    <!-- Данные -->
+    <include file="db.changelog-data-test.xml" relativeToChangelogFile="true" context="test"/>
+</databaseChangeLog>

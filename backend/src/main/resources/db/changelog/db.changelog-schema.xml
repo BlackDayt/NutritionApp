@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Создание таблиц -->
+    <!-- tags -->
+    <changeSet id="schema-1" author="dev">
+        <createTable tableName="tags">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- ingredients -->
+    <changeSet id="schema-2" author="dev">
+        <createTable tableName="ingredients">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- recipes -->
+    <changeSet id="schema-3" author="dev">
+        <createTable tableName="recipes">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="calories" type="integer" />
+            <column name="proteins" type="integer"/>
+            <column name="fats" type="integer"/>
+            <column name="carbohydrates" type="integer"/>
+            <column name="cook_time" type="integer"/>
+            <column name="servings" type="integer"/>
+            <column name="instructions" type="TEXT"/>
+            <column name="image_url" type="varchar(512)"/>
+        </createTable>
+    </changeSet>
+
+    <!-- users -->
+    <changeSet id="schema-4" author="dev" runAlways="true">
+        <createTable tableName="users">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="telegram_id" type="BIGINT">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)"/>
+            <column name="gender" type="varchar(50)"/>
+            <column name="age" type="integer"/>
+            <column name="weight" type="integer"/>
+            <column name="height" type="integer"/>
+            <column name="activity_level" type="varchar(50)"/>
+            <column name="diet_goal" type="varchar(50)"/>
+            <column name="goal_calories" type="integer"/>
+            <column name="meal_count" type="integer"/>
+            <column name="meal_plan_json" type="JSONB"/>
+        </createTable>
+    </changeSet>
+
+    <!-- recipe_tags -->
+    <changeSet id="schema-5" author="dev">
+        <createTable tableName="recipe_tags">
+            <column name="recipe_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="integer"/>
+        </createTable>
+        <addPrimaryKey tableName="recipe_tags" columnNames="recipe_id, tag_id"/>
+        <addForeignKeyConstraint baseTableName="recipe_tags" baseColumnNames="recipe_id"
+                                 referencedTableName="recipes" referencedColumnNames="id"
+                                 constraintName="fk_recipe_tags_recipe"/>
+        <addForeignKeyConstraint baseTableName="recipe_tags" baseColumnNames="tag_id"
+                                 referencedTableName="tags" referencedColumnNames="id"
+                                 constraintName="fk_recipe_tags_tag"/>
+    </changeSet>
+
+    <!-- recipe_ingredients -->
+    <changeSet id="schema-6" author="dev">
+        <createTable tableName="recipe_ingredients">
+            <column name="recipe_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ingredient_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="float"/>
+            <column name="unit" type="varchar(50)"/>
+            <column name="quantity_text" type="varchar(255)"/>
+        </createTable>
+        <addPrimaryKey tableName="recipe_ingredients" columnNames="recipe_id, ingredient_id"/>
+        <addForeignKeyConstraint baseTableName="recipe_ingredients" baseColumnNames="recipe_id"
+                                 referencedTableName="recipes" referencedColumnNames="id"
+                                 constraintName="fk_recipe_ingredients_recipe"/>
+        <addForeignKeyConstraint baseTableName="recipe_ingredients" baseColumnNames="ingredient_id"
+                                 referencedTableName="ingredients" referencedColumnNames="id"
+                                 constraintName="fk_recipe_ingredients_ingredient"/>
+    </changeSet>
+
+
+
+    <changeSet id="schema-7" author="dev">
+        <createTable tableName="user_excluded_ingredients">
+            <column name="user_id" type="bigint"/>
+            <column name="ingredient_id" type="bigint"/>
+        </createTable>
+        <addPrimaryKey tableName="user_excluded_ingredients" columnNames="user_id, ingredient_id"/>
+        <addForeignKeyConstraint baseTableName="user_excluded_ingredients" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"
+                                 constraintName="fk_user_excluded_ingredients_user"/>
+        <addForeignKeyConstraint baseTableName="user_excluded_ingredients" baseColumnNames="ingredient_id"
+                                 referencedTableName="ingredients" referencedColumnNames="id"
+                                 constraintName="fk_user_excluded_ingredients_ingredient"/>
+    </changeSet>
+</databaseChangeLog>

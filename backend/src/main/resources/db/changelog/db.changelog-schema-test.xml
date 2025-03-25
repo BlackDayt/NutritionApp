@@ -68,7 +68,7 @@
             <column name="diet_goal" type="varchar(50)"/>
             <column name="goal_calories" type="integer"/>
             <column name="meal_count" type="integer"/>
-            <column name="meal_plan" type="JSONB"/>
+            <column name="meal_plan" type="jsonb"/>
         </createTable>
     </changeSet>
 

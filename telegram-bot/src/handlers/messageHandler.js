@@ -1,3 +1,4 @@
+const { contextService } = require("../services/contextService");
 const questionService = require('../services/questionService'); // ✅ Теперь работает
 
 
@@ -6,10 +7,24 @@ const messageHandler = (bot) => {
         const chatId = msg.chat.id;
         const text = msg.text;
 
-
         if (text?.startsWith('/')) return;  // if (text && text.startsWith('/')) return;
-        await questionService.handleAnswer(bot, msg);
-        // bot.sendMessage(chatId, 'Пожалуйста, используйте кнопки для навигации.');
+
+        const context = contextService.getContext(chatId);
+
+        switch (context) {
+            case 'survey':
+                await questionService.handleTextAnswer(bot, msg);
+                break;
+
+            case 'search':
+                // В будущем можно подключить recipeService
+                bot.sendMessage(chatId, "🔍 Введите название блюда для поиска рецепта:");
+                break;
+
+            case "idle":
+            default:
+                bot.sendMessage(chatId, 'Выберите действие с помощью меню.');
+        }
     });
 };
 

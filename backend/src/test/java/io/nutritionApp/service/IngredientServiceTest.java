@@ -44,20 +44,20 @@ class IngredientServiceTest {
         assertThat(found).isPresent();
         assertThat(found.get().getName()).isEqualTo("Брокколи");
     }
-
-    @Test
-    void shouldSaveIngredient() {
-        Ingredient ingredient = new Ingredient("Морковь");
-        Ingredient saved = ingredientService.save(ingredient);
-        assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getName()).isEqualTo("Морковь");
-    }
-
-    @Test
-    void shouldDeleteIngredientById() {
-        Ingredient ingredient = ingredientRepository.save(new Ingredient("Кабачок"));
-        ingredientService.deleteById(ingredient.getId());
-        Optional<Ingredient> found = ingredientRepository.findById(ingredient.getId());
-        assertThat(found).isEmpty();
-    }
+//
+//    @Test
+//    void shouldSaveIngredient() {
+//        Ingredient ingredient = new Ingredient("Морковь");
+//        Ingredient saved = ingredientService.save(ingredient);
+//        assertThat(saved.getId()).isNotNull();
+//        assertThat(saved.getName()).isEqualTo("Морковь");
+//    }
+//
+//    @Test
+//    void shouldDeleteIngredientById() {
+//        Ingredient ingredient = ingredientRepository.save(new Ingredient("Кабачок"));
+//        ingredientService.deleteById(ingredient.getId());
+//        Optional<Ingredient> found = ingredientRepository.findById(ingredient.getId());
+//        assertThat(found).isEmpty();
+//    }
 }

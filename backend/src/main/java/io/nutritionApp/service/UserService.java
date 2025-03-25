@@ -43,16 +43,22 @@ public class UserService {
     public User createUser(User user, List<UUID> tagIds, List<UUID> ingredientIds) {
         log.info("Создание нового пользователя с telegramId: {}", user.getTelegramId());
         // Сохраняем самого пользователя
-        User savedUser = userRepository.save(user);
 
         // Преобразуем теги в UserPreferredTag с помощью фабричного метода
-        savedUser.setPreferredTags(mapTags(savedUser, tagIds));
-        savedUser.setExcludedIngredients(mapIngredients(savedUser, ingredientIds));
+//        user.getPreferredTags().clear();
+//        user.getPreferredTags().addAll(mapTags(user, tagIds));
+//
+//        user.getExcludedIngredients().clear();
+//        user.getExcludedIngredients().addAll(mapIngredients(user, ingredientIds));
 
-        savedUser.updateGoalCalories();
 
-        log.debug("Пользователь {} успешно создан с Id: {}", user.getName(), savedUser.getId());
-        return userRepository.save(savedUser);
+        user.setPreferredTags(mapTags(user, tagIds));
+        user.setExcludedIngredients(mapIngredients(user, ingredientIds));
+
+//        user.updateGoalCalories(); // важно!
+
+        log.debug("Пользователь {} успешно создан с Id: {}", user.getName(), user.getId());
+        return userRepository.save(user);
     }
 
     public User updateUser(UUID userId, User updatedUser, List<UUID> newTagIds, List<UUID> newIngredientIds) {
@@ -61,6 +67,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
         // Обновляем основные поля пользователя
+
         user.setName(updatedUser.getName());
         user.setAge(updatedUser.getAge());
         user.setWeight(updatedUser.getWeight());
@@ -78,7 +85,6 @@ public class UserService {
         user.getExcludedIngredients().clear();
         user.getExcludedIngredients().addAll(mapIngredients(user, newIngredientIds));
 
-        user.updateGoalCalories();
         log.debug("Пользователь {} обновлен", user.getId());
         return userRepository.save(user);
     }

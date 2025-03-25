@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.util.*;
 
@@ -19,6 +20,7 @@ import java.util.*;
 @Table(name = "users")
 @Getter
 @Setter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -65,14 +67,17 @@ public class User {
     @Column(nullable = false)
     private int mealCount;
 
-    @Convert(converter = MealPlanConverter.class)
+
     @Column(name = "meal_plan", columnDefinition = "jsonb")
+    @Convert(converter = MealPlanConverter.class)
+    @ColumnTransformer(write = "?::jsonb")
     private MealPlan mealPlan;  // Храним рацион в виде JSON
 
-
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<UserPreferredTag> preferredTags = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<UserExcludedIngredient> excludedIngredients = new HashSet<>();
 
@@ -133,17 +138,17 @@ public class User {
     }
 
 
-    public MealPlan getMealPlan() {
-        return mealPlan != null ? mealPlan : new MealPlan();
-    }
+//    public MealPlan getMealPlan() {
+//        return mealPlan != null ? mealPlan : new MealPlan();
+//    }
 
     // 🔹 Устанавливаем mealPlanJson безопасно
-    public void setMealPlan(MealPlan mealPlan) {
-        if (mealPlan == null || mealPlan.getMeals().isEmpty()) {
-            throw new IllegalArgumentException("План питания не может быть пустым");
-        }
-        this.mealPlan = mealPlan;
-    }
+//    public void setMealPlan(MealPlan mealPlan) {
+//        if (mealPlan == null || mealPlan.getMeals().isEmpty()) {
+//            throw new IllegalArgumentException("План питания не может быть пустым");
+//        }
+//        this.mealPlan = mealPlan;
+//    }
 
     // Setters
     public void setWeight(double weight) {

@@ -5,38 +5,47 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nutritionApp.model.MealPlan;
 import jakarta.persistence.AttributeConverter;
+import org.apache.commons.lang3.StringUtils;
 import jakarta.persistence.Converter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
 
-@Converter
+@Converter(autoApply = true)
 public class MealPlanConverter implements AttributeConverter<MealPlan, String> {
 
+    private static final Logger log = LoggerFactory.getLogger(MealPlanConverter.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
 
     @Override
     public String convertToDatabaseColumn(MealPlan mealPlan) {
-        if (mealPlan == null || mealPlan.getMeals() == null) {
-            return "{}";
-        }
+        String someClassJson = null;
         try {
-            return objectMapper.writeValueAsString(mealPlan.getMeals());
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Ошибка сериализации в JSON", e);
+            someClassJson = objectMapper.writeValueAsString(mealPlan.getMeals()); //getMeals---
+        } catch (final JsonProcessingException e) {
+            log.error("JSON writing error", e);
         }
+
+        return someClassJson;
     }
 
     @Override
     public MealPlan convertToEntityAttribute(String json) {
-        if (json == null || json.isBlank()) {
-            return new MealPlan();
+        Map<String, Double> map = null;
+        if (StringUtils.isBlank(json)) {
+            return null;
         }
         try {
-            Map<String, Double> meals = objectMapper.readValue(json, new TypeReference<>() {});
-            return new MealPlan(meals);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Ошибка десериализации JSON", e);
+            map = objectMapper.readValue(json, new TypeReference<>() {});
+//            mealPlan = objectMapper.readValue(json, MealPlan.class);
+
+        } catch (final IOException e) {
+            log.error("JSON reading error", e);
         }
+
+        return new MealPlan(map);
     }
 }

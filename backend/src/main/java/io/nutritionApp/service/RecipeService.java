@@ -3,6 +3,7 @@ package io.nutritionApp.service;
 import io.nutritionApp.model.entity.Recipe;
 import io.nutritionApp.model.entity.User;
 import io.nutritionApp.repository.RecipeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,8 @@ import java.util.Random;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class RecipeService {
-    private static final Logger log = LoggerFactory.getLogger(RecipeService.class);
-
     private final RecipeRepository recipeRepository;
 
     private final Random random = new Random();
@@ -55,4 +55,20 @@ public class RecipeService {
         log.info("Рецепт для пользователя {}: {}", user.getTelegramId(), randomRecipe.getName());
         return Optional.of(randomRecipe);
     }
+
+    public List<Recipe> findByRecipeTags(List<UUID> tagIds) {
+        log.debug("Поиск рецептов по тегам: {}", tagIds);
+        return recipeRepository.findByRecipeTags(tagIds);
+    }
+
+    public List<Recipe> findByExcludedIngredients(List<UUID> excludedIngredientIds) {
+        log.debug("Поиск рецептов с исключением ингредиентов: {}", excludedIngredientIds);
+        return recipeRepository.findByExcludedIngredients(excludedIngredientIds);
+    }
+
+    public List<Recipe> findByCaloriesRange(Integer minCalories, Integer maxCalories) {
+        log.debug("Поиск рецептов с калорийностью от {} до {}", minCalories, maxCalories);
+        return recipeRepository.findByCaloriesBetween(minCalories, maxCalories);
+    }
+
 }

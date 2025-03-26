@@ -10,7 +10,7 @@ const dietGoal = (bot, query, value) => {
 
     console.log(`[dietGoal.js] Выбрано значение: ${value}`);
 
-    questionService.handleInlineAnswer(bot, chatId, 'dietGoal', value);
+    questionService.handleInlineAnswer(bot, query, 'dietGoal', value);
 };
 
 module.exports = { dietGoal };

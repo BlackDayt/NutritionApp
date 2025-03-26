@@ -1,16 +1,16 @@
 const questionService = require('../../services/questionService');
 
-const activityLevel = (bot, query, value) => {
+const preferredTags = (bot, query, value) => {
     const chatId = query.message.chat.id;
 
     if (!value) {
         bot.sendMessage(chatId, '❌ Не удалось определить ваш выбор. Попробуйте снова.');
-    return;
+        return;
     }
 
-    console.log(`[activityLevel.js] Выбрано значение: ${value}`);
+    console.log(`[preferredTags.js] Выбрано значение: ${value}`);
 
-    questionService.handleInlineAnswer(bot, query, 'activityLevel', value);
+    questionService.handleInlineAnswer(bot, query, 'preferredTags', value);
 };
 
-module.exports = { activityLevel };
+module.exports = { preferredTags };

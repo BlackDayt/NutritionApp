@@ -10,7 +10,7 @@ const gender = (bot, query, value) => {
 
     console.log(`[gender.js] Выбрано значение: ${value}`);
 
-    questionService.handleInlineAnswer(bot, chatId, 'gender', value);
+    questionService.handleInlineAnswer(bot, query, 'gender', value);
 };
 
 module.exports = { gender };

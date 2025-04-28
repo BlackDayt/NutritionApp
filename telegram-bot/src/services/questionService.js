@@ -1,10 +1,13 @@
 const axios = require('axios');
 const { backendUrl } = require('../config/config');
+const {keyboardService} = require("./keyboardService");
+const camelcaseKeys = require('camelcase-keys').default;
+const { contextService } = require("../services/contextService");
 
 class QuestionService {
     constructor() {
         this.userAnswers = new Map(); // Хранилище ответов пользователей
-        this.questions = [
+        this.baseQuestions = [
             { key: 'name', text: 'Как тебя зовут?', type: 'text' },
             { key: 'gender', text: 'Укажи пол:', type: 'inline', options: [
                     { text: 'Мужской', callback: 'MALE' },
@@ -13,20 +16,25 @@ class QuestionService {
             { key: 'age', text: 'Сколько тебе лет?', type: 'text' },
             { key: 'height', text: 'Какой у тебя рост (в см)?', type: 'text' },
             { key: 'weight', text: 'Какой у тебя вес (в кг)?', type: 'text' },
-            { key: 'activityLevel', text: 'Выбери активность:', type: 'inline', options: [
+            { key: 'activity_level', text: 'Выбери активность:', type: 'inline', options: [
                     { text: 'Малоподвижный образ жизни', callback: 'SEDENTARY' },
                     { text: 'Лёгкие тренировки 1-3 раза в неделю', callback: 'LIGHT' },
-                    { text: 'СредТренировки 3-5 раз в неделюняя', callback: 'MODERATE' },
+                    { text: 'СредТренировки 3-5 раз в неделю', callback: 'MODERATE' },
                     { text: 'Тренировки 5-7 раз в неделю', callback: 'ACTIVE' },
                     { text: 'Интенсивные тренировки каждый день', callback: 'VERY_ACTIVE' }
                 ] },
-            { key: 'dietGoal', text: 'Твоя цель:', type: 'inline', options: [
+            { key: 'diet_goal', text: 'Твоя цель:', type: 'inline', options: [
                     { text: 'Поддержание веса', callback: 'MAINTAIN' },
                     { text: 'Похудение', callback: 'WEIGHT_LOSS' },
                     { text: 'Экстремальное похудение', callback: 'EXTREME_WEIGHT_LOSS' },
                     { text: 'Набор массы', callback: 'MUSCLE_GAIN' },
                     { text: 'Интенсивный набор массы', callback: 'BULK' },
                     { text: 'Сушка', callback: 'CUTTING' }
+                ]},
+            { key: 'meal_count', text: 'Количество приемов пищи:', type: 'inline', options: [
+                    { text: '3', callback: '3' },
+                    { text: '4', callback: '4' },
+                    { text: '5', callback: '5' }
                 ]}
         ];
     }
@@ -35,21 +43,48 @@ class QuestionService {
      * Запуск опроса для пользователя
      * @param {Object} bot - экземпляр Telegram Bot
      * @param {Number} chatId - ID чата пользователя
+     * @param messageId - ID сообщения
      */
-    async startSurvey(bot, chatId) {
+    // async startSurvey(bot, { chatId, messageId }) {
+    async startSurvey(bot, chatId, messageId) {
         this.userAnswers.set(chatId, { step: 0, answers: {} });
 
+        const questions = [...this.baseQuestions];
+
         // Загрузка тегов
-        this.tags = await this.fetchTags();
-        this.questions.push({
-            key: 'preferredTags',
+        const tags =await this.fetchTags();
+        this.tags = tags;
+        questions.push({
+            key: 'preferred_tags',
             text: 'Выбери теги, которые тебе подходят. Можно выбрать несколько:',
             type: 'inline',
             multiple: true,
-            options: this.tags.map(tag => ({
+            options: tags.map(tag => ({
                 text: tag.name,
                 callback: tag.id
-            })).concat([{ text: '✅ Готово', callback: 'tagDone' }])
+            })).concat([{ text: '✅ Готово', callback: 'tag_done' }])
+        });
+
+        // Загрузка ингредиентов
+        const ingredients =await this.fetchIngredients();
+        this.ingredients = ingredients;
+        questions.push({
+            key: 'excluded_ingredients',
+            text: 'Выбери ингредиенты, которые ты хочешь исключить. Можно выбрать несколько:',
+            type: 'inline',
+            multiple: true,
+            options: ingredients.map(ingredient => ({
+                text: ingredient.name,
+                callback: ingredient.id
+            })).concat([{ text: '✅ Готово', callback: 'ingredient_done' }])
+        });
+
+        // Устанавливаем анкету и ответы
+        this.userAnswers.set(chatId, {
+            step: 0,
+            answers: {},
+            questions, // <-- индивидуально для каждого пользователя
+            messageId
         });
 
         this.sendNextQuestion(bot,  chatId);
@@ -64,26 +99,25 @@ class QuestionService {
         const userState = this.userAnswers.get(chatId);
         if (!userState) return;
 
-        const  step = userState.step;
+        const  { step, questions, messageId } = userState;
 
 
-        if (step >= this.questions.length) {
-            this.finishSurvey(bot, chatId, userState.answers);
+        if (step >= questions.length) {
+            this.finishSurvey(bot, chatId, userState.answers, messageId);
             this.userAnswers.delete(chatId);
             return;
         }
 
-        const currentQuestion = this.questions[step];
+        const currentQuestion = questions[step];
         console.log(`[sendNextQuestion] chatId: ${chatId}, step: ${step}, question: ${currentQuestion.key}`);
+        let keyboard;
 
         if (currentQuestion.type === 'inline') {
-            let keyboard;
 
-            // const horizontalKeys = ['gender', 'activityLevel'];
-            // if (horizontalKeys.includes(currentQuestion.key)) {
+            const horizontalKeys = ['gender', 'meal_count'];
 
             // Кастомное горизонтальное расположение только для выбора пола
-            if (currentQuestion.key === 'gender') {
+            if (horizontalKeys.includes(currentQuestion.key)) {
                 keyboard = [
                     currentQuestion.options.map(opt => ({
                         text: opt.text,
@@ -98,24 +132,19 @@ class QuestionService {
                 }]);
             }
 
-            // else if (currentQuestion.key === 'mainMenu') {
-            //     // Кастомная раскладка под главное меню
-            //     inlineKeyboard = [
-            //         [{ text: 'Регистрация', callback_data: 'mainMenu:register' }],
-            //         [
-            //             { text: 'Генерация', callback_data: 'mainMenu:generate' },
-            //             { text: 'Поиск по ID', callback_data: 'mainMenu:search' }
-            //         ],
-            //         [{ text: 'Управление подпиской', callback_data: 'mainMenu:subscription' }]
-            //     ];
-            // }
-
+            // bot.editMessageText(currentQuestion.text, {
+            //     chat_id: chatId,
+            //     message_id: messageId,
+            //     reply_markup: { inline_keyboard: keyboard }
+            // });
             bot.sendMessage(chatId, currentQuestion.text, {
-                reply_markup: {
-                    inline_keyboard: keyboard
-                }
+                reply_markup: { inline_keyboard: keyboard }
             });
         } else {
+            // bot.editMessageText(currentQuestion.text, {
+            //     chat_id: chatId,
+            //     message_id: messageId
+            // });
             bot.sendMessage(chatId, currentQuestion.text);
         }
     }
@@ -131,7 +160,8 @@ class QuestionService {
 
         const userState = this.userAnswers.get(chatId);
         const currentStep = userState.step;
-        const currentQuestion = this.questions[currentStep];
+        const { questions } = userState;
+        const currentQuestion = questions[currentStep];
 
         console.log(`[handleTextAnswer] chatId: ${chatId}, step: ${currentStep}, questionKey: ${currentQuestion?.key}`);
 
@@ -150,13 +180,20 @@ class QuestionService {
         if (!this.userAnswers.has(chatId)) return;
 
         const userState = this.userAnswers.get(chatId);
-        const currentQuestion = this.questions[userState.step];
+        const currentStep = userState.step;
+        const { questions } = userState;
+        const currentQuestion = questions[currentStep];
+
 
         if (!currentQuestion || currentQuestion.key !== key || currentQuestion.type !== 'inline') return;
 
+        const isMultiSelect = currentQuestion.multiple;
+        const doneValue = key === 'preferred_tags' ? 'tag_done' :
+            key === 'excluded_ingredients' ? 'ingredient_done' : 'done';
+
         // Если это множественный выбор тегов
-        if (currentQuestion.multiple) {
-            if (value === 'tagDone') {
+        if (isMultiSelect) {
+            if (value === doneValue) {
                 userState.step++;
                 this.sendNextQuestion(bot, chatId);
                 return;
@@ -171,8 +208,15 @@ class QuestionService {
             }
             userState.answers[key] = selected;
 
-            const selectedNames = selected
-                .map(id => this.tags.find(tag => tag.id === id)?.name || id);
+            const selectedNames = selected.map(id => {
+                if (key === 'preferred_tags') {
+                    return this.tags.find(tag => tag.id === id)?.name || id;
+                } else if (key === 'excluded_ingredients') {
+                    return this.ingredients.find(ing => ing.id === id)?.name || id;
+                }
+                return id;
+            });
+
             const selectedText = selected.length
                 ? `\n\n✅ Выбрано: ${selectedNames.join(', ')}`
                 : '\n\nПока ничего не выбрано.';
@@ -191,12 +235,7 @@ class QuestionService {
                 }
             });
 
-            // bot.sendMessage(chatId, currentQuestion.text + selectedText, {
-            //     reply_markup: {
-            //         inline_keyboard: updatedKeyboard
-            //     }
-            // });
-            return; // Не переходим к следующему шагу
+            return;
         }
 
         console.log(`[handleInlineAnswer] key: ${key}, value: ${value}, step: ${userState.step}`);
@@ -209,29 +248,46 @@ class QuestionService {
     /**
      * Отправка данных пользователя на сервер
      * @param {Object} bot - экземпляр Telegram Bot
-     * @param {Number} chatId - ID чата пользователя
+     * @param chatId
      * @param answers - ответы
-    */
-    async finishSurvey(bot, chatId, answers) {
-        const {preferredTags, ...rest} = answers;
-        const userData = {
+     * @param messageId
+     */
+    async finishSurvey(bot, chatId, answers, messageId) {
+        const {preferredTags, excludedIngredients, ...rest} = answers;
+        const snakeUserData = {
             telegramId: chatId,
-            mealCount: 3,
             preferredTagIds: preferredTags ?? [],
-            excludedIngredientIds: [],
+            excludedIngredientIds: excludedIngredients ?? [],
             ...rest
         };
+        const userData = camelcaseKeys(snakeUserData, {deep: true});
+        console.log(userData);
 
         try{
             console.log(userData);
             const response = await axios.post(`${backendUrl}/api/users`, userData);
 
-            bot.sendMessage(chatId, `✅ Анкета заполнена! Данные отправлены.
+            // await bot.editMessageText(`✅ Анкета заполнена! Данные отправлены.
+            //     Рост: ${userData.height} см
+            //     Вес: ${userData.weight} кг
+            //     Пол: ${userData.gender}`, {
+            //         chat_id: chatId,
+            //         message_id: messageId
+            //     }
+            // );
+            await bot.sendMessage(chatId, `✅ Анкета заполнена! Данные отправлены.
                 Рост: ${userData.height} см
                 Вес: ${userData.weight} кг
                 Пол: ${userData.gender}`
             );
+
+            contextService.clearContext(chatId);
+
+            await bot.sendMessage(chatId, '🏠 Главное меню:', {
+                reply_markup: keyboardService.getMainMenu(chatId)
+            });
         } catch (error) {
+            contextService.clearContext(chatId);
             console.error('Ошибка при отправке данных:', error.message);
             bot.sendMessage(chatId, '❌ Ошибка при регистрации. Попробуйте позже.');
         }
@@ -253,7 +309,7 @@ class QuestionService {
             const response = await axios.get(`${backendUrl}/api/ingredients`);
             return response.data; // предполагается, что это массив с { id, name }
         } catch (error) {
-            console.error('Ошибка при получении тегов:', error.message);
+            console.error('Ошибка при получении ингредиентов:', error.message);
             return [];
         }
     }

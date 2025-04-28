@@ -1,38 +1,51 @@
 const { navigationService } = require('../services/navigationService');
+const axios = require('axios');
+const { backendUrl } = require('../config/config');
+
+async function isRegistered(telegramId) {
+    try {
+        const response = await axios.get(`${backendUrl}/api/users/telegram/${telegramId}`);
+        return response.status === 200 && response.data !== null;
+    } catch (e) {
+        return false;
+    }
+}
 
 const keyboardService = {
-    getMainMenu: () => ({
-        inline_keyboard: [
-            [{ text: 'Регистрация', callback_data: 'registration' }],
-            [{ text: 'Генерация', callback_data: 'generate' }, { text: 'Поиск по ID', callback_data: 'searchById' }],
-            [{ text: 'Управление подпиской', callback_data: 'menageSubscription' }]
-        ]
-    }),
+    getMainMenu: async (telegramId) => {
+        const isUserRegistered = await isRegistered(telegramId);
 
-    mainMenu: {
-        inline_keyboard: [
-            [{ text: 'Регистрация', callback_data: 'registration' }],
-            [{ text: 'Генерация', callback_data: 'generate' }, { text: 'Поиск по ID', callback_data: 'searchById' }],
-            [{ text: 'Управление подпиской', callback_data: 'menageSubscription' }]
-        ]
+        const keyboard = [];
+
+        if (!isUserRegistered) {
+            keyboard.push([{ text: '📝 Регистрация', callback_data: 'registration' }]);
+        } else {
+            keyboard.push([{ text: '🍽 Твой план питания', callback_data: 'meal_plan' }]);
+        }
+
+        keyboard.push([
+            { text: '🎲 Случайный рецепт', callback_data: `random_recipe:${Date.now()}` },
+            { text: '🔍 Поиск по ID', callback_data: 'search_by_id' }
+        ]);
+
+        keyboard.push([{ text: '⚙️ Настройки', callback_data: 'settings_menu' }]);
+
+        keyboard.push([{ text: '⚙️ Управление подпиской', callback_data: 'manage_subscription' }]);
+
+
+        return { inline_keyboard: keyboard };
     },
 
-    settingsMenu: {
-        inline_keyboard: [
-            [{ text: 'Изменить профиль', callback_data: 'edit_profile' }],
-            [{ text: 'Подписки', callback_data: 'subscriptions' }],
-            [{ text: 'Назад', callback_data: 'back' }]
-        ]
-    },
+    getSettingsMenu: async (telegramId) => {
 
-    getCustomMenu: (options) => {
-        return {
-            inline_keyboard: options.map((option) => [
-                { text: option.label, callback_data: option.callback }
-            ])
-        };
-    },
+        const keyboard = [
+            [{ text: '✏️ Изменить профиль', callback_data: 'edit_profile' }],
+            [{ text: '🔄 Пройти анкету заново', callback_data: 'restart_survey' }],
+            [{ text: '⬅️ Назад', callback_data: 'main_menu' }]
+        ];
 
+        return { inline_keyboard: keyboard };
+    },
 
     // Метод для отправки клавиатуры и сохранения в стек
     sendKeyboard: (bot, chatId, text, keyboard) => {

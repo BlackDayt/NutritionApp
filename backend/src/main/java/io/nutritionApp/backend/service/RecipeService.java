@@ -1,0 +1,76 @@
+package io.nutritionapp.backend.service;
+
+import io.nutritionapp.backend.model.entity.Recipe;
+import io.nutritionapp.backend.model.entity.User;
+import io.nutritionapp.backend.repository.RecipeRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+
+@Service
+@Slf4j
+public class RecipeService {
+    private final RecipeRepository recipeRepository;
+
+    private final Random random = new Random();
+
+    public RecipeService(RecipeRepository recipeRepository) {
+        this.recipeRepository = recipeRepository;
+    }
+
+    /**
+     * Получает случайный рецепт для пользователя, учитывая его предпочтения и исключенные ингредиенты.
+     */
+    public Optional<Recipe> findRandomRecipeForUser(User user) {
+        log.debug("Получение рандомного рецепта для пользователя: {}", user.getTelegramId());
+
+        List<UUID> preferredTags = user.getPreferredTags().stream()
+                .map(userPreferredTag -> userPreferredTag.getTag().getId()).toList();
+
+        List<UUID> excludedIngredients = user.getExcludedIngredients().stream()
+                .map(userExcludedIngredient -> userExcludedIngredient.getIngredient().getId()).toList();
+
+        // Получаем список рецептов, соответствующих тегам
+        List<Recipe> recipes = preferredTags.isEmpty()
+                ? recipeRepository.findAll()
+                : recipeRepository.findByRecipeTags(preferredTags);
+
+        // Фильтруем рецепты, исключая те, которые содержат запрещенные ингредиенты
+        List<Recipe> filteredRecipes = recipes.stream()
+                .filter(recipe -> recipe.getRecipeIngredients().stream()
+                        .noneMatch(recipeIngredient -> excludedIngredients.contains(recipeIngredient.getIngredient().getId()))
+                )
+                .toList();
+
+        // Если после фильтрации остались рецепты, выбираем случайный
+        if (filteredRecipes.isEmpty()) {
+            log.warn("Нет подходящих рецептов для пользователя {}", user.getTelegramId());
+            return Optional.empty();
+        }
+        Recipe randomRecipe = filteredRecipes.get(random.nextInt(filteredRecipes.size()));
+        log.info("Рецепт для пользователя {}: {}", user.getTelegramId(), randomRecipe.getName());
+        return Optional.of(randomRecipe);
+    }
+
+    public List<Recipe> findByRecipeTags(List<UUID> tagIds) {
+        log.debug("Поиск рецептов по тегам: {}", tagIds);
+        return recipeRepository.findByRecipeTags(tagIds);
+    }
+
+    public List<Recipe> findByExcludedIngredients(List<UUID> excludedIngredientIds) {
+        log.debug("Поиск рецептов с исключением ингредиентов: {}", excludedIngredientIds);
+        return recipeRepository.findByExcludedIngredients(excludedIngredientIds);
+    }
+
+    public List<Recipe> findByCaloriesRange(Integer minCalories, Integer maxCalories) {
+        log.debug("Поиск рецептов с калорийностью от {} до {}", minCalories, maxCalories);
+        return recipeRepository.findByCaloriesBetween(minCalories, maxCalories);
+    }
+
+}

@@ -12,11 +12,14 @@ const loadCallbacks = (dir) => {
             const callbackName = file.replace(".js", "");
             const callbackModule = require(fullPath);
 
-            if (!callbackModule[callbackName]) {
-                console.warn(`⚠ Нет обработчика в файле ${file}`);
-            } else {
+            if (typeof callbackModule === 'function') {
+                callbacks[callbackName] = callbackModule;
+                console.log(`✔ Загружен коллбэк: ${callbackName}`);
+            } else if (callbackModule[callbackName]) {
                 callbacks[callbackName] = callbackModule[callbackName];
                 console.log(`✔ Загружен коллбэк: ${callbackName}`);
+            } else {
+                console.warn(`⚠ Нет обработчика в файле ${file}`);
             }
         }
     });

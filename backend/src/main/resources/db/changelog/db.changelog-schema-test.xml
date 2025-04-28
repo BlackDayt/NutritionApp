@@ -35,6 +35,9 @@
             <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="public_id" type="BIGINT">
+                <constraints unique="true" nullable="false"/>
+            </column>
             <column name="name" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>

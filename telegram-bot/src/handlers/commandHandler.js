@@ -1,16 +1,15 @@
-const { keyboardService } = require('../services/keyboardService')
+const { keyboardService } = require('../services/keyboardService');
+const { contextService } = require('../services/contextService');
+
 const commandHandler = (bot) => {
-    bot.onText(/\/start/, (msg) => {
+    bot.onText(/\/start/, async (msg) => {
         const chatId = msg.chat.id;
-        const text = 'Нажми на кнопку, чтобы отправить запрос на сервер: ';
-        keyboardService.sendKeyboard(bot, chatId, text, keyboardService.mainMenu);
+        const text = 'Выберите действие из меню: ';
+        contextService.clearContext(chatId);
+        // Получаем динамическое меню с проверкой регистрации
+        const keyboard = await keyboardService.getMainMenu(chatId);
+        keyboardService.sendKeyboard(bot, chatId, text, keyboard);
     });
 };
-
-// const sendInitialKeyboard = (bot, chatId) => {
-//     bot.sendMessage(chatId, 'Нажми на кнопку, чтобы отправить запрос на сервер:', {
-//         reply_markup: initialKeyboard
-//     });
-// };
 
 module.exports = { commandHandler };

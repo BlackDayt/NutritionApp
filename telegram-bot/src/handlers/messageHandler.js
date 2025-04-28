@@ -1,5 +1,6 @@
 const { contextService } = require("../services/contextService");
 const questionService = require('../services/questionService'); // ✅ Теперь работает
+const { recipeService } = require('../services/recipeService');
 
 
 const messageHandler = (bot) => {
@@ -12,13 +13,18 @@ const messageHandler = (bot) => {
         const context = contextService.getContext(chatId);
 
         switch (context) {
-            case 'survey':
+            case 'registration':
                 await questionService.handleTextAnswer(bot, msg);
                 break;
 
-            case 'search':
-                // В будущем можно подключить recipeService
-                bot.sendMessage(chatId, "🔍 Введите название блюда для поиска рецепта:");
+            case 'search_recipe_by_id':
+                try {
+                    let recipe = await recipeService.getById(text);
+                    bot.sendMessage(chatId, recipeService.format(recipe));
+                } catch (err) {
+                    console.error('Ошибка при поиске рецепта:', err.message);
+                    await bot.sendMessage(chatId, '❌ Не удалось найти рецепт.');
+                }
                 break;
 
             case "idle":

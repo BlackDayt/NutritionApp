@@ -65,6 +65,7 @@
     <changeSet id="data-3" author="dev" runAlways="true">
         <insert tableName="recipes">
             <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="public_id" value="1"/>
             <column name="name" value="Веганский суп"/>
             <column name="description" value="Полезный суп из овощей"/>
             <column name="calories" valueNumeric="200"/>
@@ -78,6 +79,7 @@
 
         <insert tableName="recipes">
             <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="public_id" value="2"/>
             <column name="name" value="Брокколи стир-фрай"/>
             <column name="description" value="Жареные брокколи с тофу"/>
             <column name="calories" valueNumeric="300"/>
@@ -91,6 +93,7 @@
 
         <insert tableName="recipes">
             <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="public_id" value="3"/>
             <column name="name" value="Кето салат"/>
             <column name="description" value="Салат с авокадо и орехами"/>
             <column name="calories" valueNumeric="450"/>
